@@ -3,9 +3,11 @@ package art.tp.gdpr.controller
 //import art.tp.gdpr.service.ServiceImplementation
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
+import art.tp.gdpr.domain.{DelFileJsonModel,CsvJsonModel}
+import spray.json._
 import org.apache.spark.sql.functions._
 
-object GdprBatch {
+object GdprBatch extends DelFileJsonModel {
   val APP_NAME = "GDPR compliance"
   val JSON_FILE = "D:\\Homeware\\DEV\\TP_GDPR\\src\\main\\resources\\gdpr_actions.json"
   val PATH = "D:\\Homeware\\DEV\\TP_GDPR\\FileSet\\"
@@ -16,6 +18,16 @@ object GdprBatch {
 
     Logger.getLogger("org").setLevel(Level.OFF)
 
+    val jsonFile = """{ "id":2,
+      "type":"delimited-file-record",
+      "path":"/foo/bar/file.csv"
+    }"""
+
+    val csvJsonModelObject = jsonFile.parseJson.convertTo[CsvJsonModel]
+
+    println(csvJsonModelObject.path)
+
+/*
     val dfJSon = sparkSession.read.json(PATH.concat( "person.json"))
 
     dfJSon.show()
@@ -29,7 +41,7 @@ object GdprBatch {
 
     dfJSon.select(avg( $"age")).show()
 
-    
+*/
 
     /*
         Logger.getLogger("org").setLevel(Level.ERROR)
