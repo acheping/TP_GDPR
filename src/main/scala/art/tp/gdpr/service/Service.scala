@@ -1,9 +1,12 @@
 package art.tp.gdpr.service
 
-trait Service {
-  def setActions(action:String)
 
-  def actionFullAnonymize()
 
-  def actionFullQuarantine()
+trait Service extends  {
+
+  //def actionFullQuarantine()
+
+  def getActionFile(file:String)
+
+  def getActionRows
 }

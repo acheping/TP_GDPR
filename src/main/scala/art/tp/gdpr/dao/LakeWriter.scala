@@ -3,18 +3,16 @@ package art.tp.gdpr.dao
 import java.io.File
 import java.nio.file.{Files, Paths, StandardCopyOption}
 
-class LakeWriter(Table: String) extends Writer {
-  val QUARANTINE_PATH = "D:\\Homeware\\DEV\\TP_GDPR\\FileSet\\Quarantine\\"
+class LakeWriter {
 
-  override def applyUpdate: Unit = {
+  def applyUpdate: Unit = {
     val query = "Msck repair table <db_name>.<table_name>"
-
   }
 
-  def quanrantine(file: String) = {
+  def quanrantine(source: String, target:String) = {
     Files.move(
-      Paths.get(file),
-      Paths.get(file + ".qte"),
+      Paths.get(source),
+      Paths.get(target),
       StandardCopyOption.REPLACE_EXISTING
     )
   }

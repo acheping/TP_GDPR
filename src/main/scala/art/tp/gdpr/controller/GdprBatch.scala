@@ -1,47 +1,58 @@
 package art.tp.gdpr.controller
 
-//import art.tp.gdpr.service.ServiceImplementation
+import art.tp.gdpr.service.ServiceImplementation
+import org.apache.hadoop.conf.Configuration
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
-import art.tp.gdpr.domain.{DelFileJsonModel,CsvJsonModel}
-import spray.json._
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.functions.broadcast
+import org.apache.spark.sql.types._
+import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import org.apache.hadoop.fs.{FileSystem, Path}
 
-object GdprBatch extends DelFileJsonModel {
+object GdprBatch {
+
   val APP_NAME = "GDPR compliance"
-  val JSON_FILE = "D:\\Homeware\\DEV\\TP_GDPR\\src\\main\\resources\\gdpr_actions.json"
-  val PATH = "D:\\Homeware\\DEV\\TP_GDPR\\FileSet\\"
+  val HOME_PATH = "D:\\Homeware\\DEV\\TP_GDPR\\FileSet\\"
+  val JSON_ACTION_FILE = HOME_PATH + "\\action\\action_delete_file.json"
+  val JSON_ACTION_ROWS = HOME_PATH + "\\action\\action_delete_rows.json"
+  val DATA_PATH = HOME_PATH + "\\" + "Data"
+  val QUARANTINE_PATH = HOME_PATH + "\\" + "Quarantine"
 
   def main(args: Array[String]): Unit = {
-
-    val sparkSession:SparkSession = SparkSession.builder().master("local[*]").getOrCreate()
-
     Logger.getLogger("org").setLevel(Level.OFF)
 
-    val jsonFile = """{ "id":2,
-      "type":"delimited-file-record",
-      "path":"/foo/bar/file.csv"
-    }"""
+    val sparkSession = SparkSession
+      .builder()
+      .master("local")
+      .appName(APP_NAME)
+      .getOrCreate()
 
-    val csvJsonModelObject = jsonFile.parseJson.convertTo[CsvJsonModel]
+    val service = new ServiceImplementation(DATA_PATH, QUARANTINE_PATH)
+    val fileContent = service.getActionFile (JSON_ACTION_FILE)
+    val rowContent = service.getActionRow (JSON_ACTION_ROWS)
 
-    println(csvJsonModelObject.path)
+    //service.fileQuarantine(fileContent)
+    service.rowQuarantine(rowContent)
 
-/*
-    val dfJSon = sparkSession.read.json(PATH.concat( "person.json"))
 
-    dfJSon.show()
 
-    dfJSon.select("name").show()
+    /*
+        val dfJSon = sparkSession.read.json(PATH.concat( "person.json"))
 
-    dfJSon.printSchema()
+        dfJSon.show()
 
-    import sparkSession.implicits._
-    dfJSon.filter($"age" > 23).show()
+        dfJSon.select("name").show()
 
-    dfJSon.select(avg( $"age")).show()
+        dfJSon.printSchema()
 
-*/
+        import sparkSession.implicits._
+        dfJSon.filter($"age" > 23).show()
+
+        dfJSon.select(avg( $"age")).show()
+
+    */
+
 
     /*
         Logger.getLogger("org").setLevel(Level.ERROR)

@@ -1,12 +1,19 @@
 package art.tp.gdpr.dao
 
-import org.apache.spark.sql.SQLContext
+import art.tp.gdpr.domain._
+import spray.json._
 
-class JsonReader(ctx: SQLContext, jsonFile:String) extends Reader{
+import scala.io.Source
 
-  override def extractAction(ctx: SQLContext, file: String): Unit = ???
+class JsonActionReader()extends FileJsonProtocol with RowJsonProtocol {
 
-  def getDataFrame() ={
-    ctx.read.json(jsonFile)
+  def extractActionFile(jsonFile: String)={
+    Source.fromFile(jsonFile).getLines.mkString.parseJson.convertTo[FileJsonModel]
   }
+
+  def extractActionRow(jsonFile: String)={
+    Source.fromFile(jsonFile).getLines.mkString.parseJson.convertTo[RowJsonModel]
+  }
+
+
 }
